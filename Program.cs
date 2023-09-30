@@ -1,28 +1,18 @@
 ﻿using System;
 using TuxStream.Provider;
 using TuxStream.Plugin;
-using TMDbLib.Objects.Search;
 using TuxStream.Core.UI;
+using TuxStream.Core;
 namespace TuxStream
 {
     internal class Program
     {
         static void Main()
         {
+            Install install = new Install();
             MainUI mainUI = new MainUI();
             mainUI.HomePage();
-            /*
-            TmdbApi tmdbApi = new TmdbApi();
-            
-            List<SearchMovie> res = tmdbApi.Search("The Matrix");
-            foreach (SearchMovie result in res)
-            {
-                Console.WriteLine(result.Title);
-                Console.WriteLine(result.Id);
-            }*/
-            /*
-            ProviderManager providerManager = new ProviderManager();
-            providerManager.RunProviders("test", 0);   */         
+     
         }
     }
 }

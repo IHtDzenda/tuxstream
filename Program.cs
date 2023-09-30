@@ -9,6 +9,7 @@ namespace TuxStream
     {
         static void Main()
         {
+            
             Install install = new Install();
             MainUI mainUI = new MainUI();
             mainUI.HomePage();

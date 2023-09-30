@@ -1,3 +1,4 @@
 providers/*
 bin/
 obj/
+Build.sh

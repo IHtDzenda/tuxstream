@@ -10,22 +10,20 @@ namespace TuxStream.Core.UI
         {
 
         }
-        public void Select(List<string> links)
+        public void Select(List<string> links, ref ConsoleKeyInfo key)
         {
             AnsiConsole.MarkupLine($"[bold]P[/]lay movie ,[bold]N[/]ew link({links.Count}/{linkIndex}), [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
-            ConsoleKeyInfo key = new ConsoleKeyInfo();
 
-            while (true)
-            {
-                key = Console.ReadKey(true);
-                if (key.Key == ConsoleKey.P) { Play(links[linkIndex].ToString()); }
-                else if (key.Key == ConsoleKey.N) { NewLink(links.Count); }
-                else if (key.Key == ConsoleKey.D) { Download(links[linkIndex]); }
-                else if (key.Key == ConsoleKey.S) { return; }
-                else if (key.Key == ConsoleKey.Q) { Environment.Exit(0); }
-                else if (key.Key == ConsoleKey.L) { Console.WriteLine(links[linkIndex]);}
 
-            }
+            key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.P) { Play(links[linkIndex].ToString()); }
+            else if (key.Key == ConsoleKey.N) { NewLink(links.Count);  }
+            else if (key.Key == ConsoleKey.D) { Download(links[linkIndex]); }
+            else if (key.Key == ConsoleKey.S) { return; }
+            else if (key.Key == ConsoleKey.Q) { Environment.Exit(0); }
+            else if (key.Key == ConsoleKey.L) { Console.WriteLine(links[linkIndex]); Thread.Sleep(5000);}
+
+
         }
         void NewLink(int linkCount)
         {

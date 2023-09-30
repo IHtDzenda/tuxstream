@@ -1,10 +1,8 @@
 using Spectre.Console;
 using TuxStream.Core.UI.Components;
 using TuxStream.Core.UI;
-using TMDbLib.Client;
-using TMDbLib.Objects.General;
-using TMDbLib.Objects.Search;
 using TuxStream.Plugin;
+using static TuxStream.Plugin.TmdbObj;
 
 namespace TuxStream.Core.UI
 {
@@ -50,22 +48,34 @@ namespace TuxStream.Core.UI
         {
             SelectPage selectPage = new SelectPage();
             ProviderManager providerManager = new ProviderManager();
-            TMDbClient client = new TMDbClient("9990db75d12d4ecd4ed84628ebc96403");//not mine :D
 
-            SearchContainer<SearchMovie> movies = client.SearchMovieAsync(query).Result;
+            TmdbApi tmdbApi = new TmdbApi();
+            List<Movie> movies =tmdbApi.Search(query);
+
+
+
             int TMDbID = selectPage.Select(movies);
             if (TMDbID == 0) { return; }
 
             List<string> links = providerManager.RunProviders(query, TMDbID);
             PlayMovie(links, TMDbID, movies);
 
+
         }
-        public void PlayMovie(List<string> links, int TMDbID, SearchContainer<SearchMovie> movies)
+        public void PlayMovie(List<string> links, int TMDbID, List<Movie> movies)
         {
-            Console.Clear();
-            MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
-            MovieActions movieActions = new MovieActions();
-            movieActions.Select(links);
+            ConsoleKeyInfo key = new ConsoleKeyInfo();
+
+            while (key.Key != ConsoleKey.S)
+            {
+                Console.Clear();
+                MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
+                MovieActions movieActions = new MovieActions();
+                movieActions.Select(links, ref key);
+
+
+            }
+
         
         }
     }

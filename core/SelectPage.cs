@@ -1,9 +1,7 @@
 using System.ComponentModel;
 using Spectre.Console;
-using TMDbLib.Client;
-using TMDbLib.Objects.Discover;
-using TMDbLib.Objects.General;
-using TMDbLib.Objects.Search;
+using TuxStream.Plugin;
+using static TuxStream.Plugin.TmdbObj;
 
 namespace TuxStream.Core.UI
 {
@@ -13,37 +11,34 @@ namespace TuxStream.Core.UI
         {
 
         }
-        public int Select(SearchContainer<SearchMovie> movies)
+        public int Select(List<Movie>  movies)
         {
             Console.Clear();
             List<string> movieList = new List<string>();
 
             movieList.Add("Search again");
-            foreach (SearchMovie movie in movies.Results)
+            foreach (Movie movie in movies)
             {
-                if (movie.ReleaseDate == null)
+                if (movie.ReleaseDate == null || movie.ReleaseDate == ""|| movie.ReleaseDate.Length <4)
                 {
                     movieList.Add(movie.Title);
                     continue;
                 }
-                movieList.Add(movie.Title + "-" + movie.ReleaseDate.Value.Year.ToString());
+                movieList.Add(movie.Title + " - " + movie.ReleaseDate?.Substring(0, 4));
             }
 
             var movieSelector = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("Selet the movie by using [green]↓[/]?")
                 .PageSize(15)
-                .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
+                .MoreChoicesText("[grey](Move up and down to reveal more movies)[/]")
                 .AddChoices(movieList));
 
 
-            foreach (SearchMovie movie in movies.Results)
+            foreach (Movie movie in movies)
             {
-                if (movie.Title == movieSelector || movie.Title + "-" + movie.ReleaseDate.Value.Year.ToString() == movieSelector)
+                if (movie.Title == movieSelector || movie.Title + " - " + movie.ReleaseDate.Substring(0, 4) == movieSelector)
                 {
-                    Console.WriteLine("found!" + movie.Id);
-                    Thread.Sleep(50);
-
                     return movie.Id;
                 }
 

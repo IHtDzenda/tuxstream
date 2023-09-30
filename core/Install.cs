@@ -28,6 +28,30 @@ namespace TuxStream.Core
             }
             throw new Exception("Cannot determine operating system!");
         }
+
+        private string DetectLinuxDistribution()
+        {
+            string releaseFile = "/etc/os-release";
+            if (File.Exists(releaseFile))
+            {
+                string[] lines = File.ReadAllLines(releaseFile);
+                foreach (string line in lines)
+                {
+                    if (line.StartsWith("ID=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string[] parts = line.Split('=');
+                        if (parts.Length > 1)
+                        {
+                            return parts[1].Trim('"');
+                        }
+                    }
+                }
+            }
+
+
+            return "debian";
+        }
+
         private void LinuxRun(string command, string arg)
         {
 
@@ -54,7 +78,13 @@ namespace TuxStream.Core
             }
             else if (os == OSPlatform.Linux)
             {
-                LinuxRun("yay", "-S --noconfirm  ffmpeg");
+                string distribution = DetectLinuxDistribution();
+                
+                if (distribution == "debian") { LinuxRun("sudo", "apt-get install -y ffmpeg"); }
+                else if (distribution == "arch")
+                { LinuxRun("sudo", "pacman -S --noconfirm  ffmpeg"); }
+                else { Console.WriteLine("Your distribution is not supported yet for auto install pleace install ffmpeg manually"); }
+
             }
             else if (os == OSPlatform.OSX)
             {
@@ -93,7 +123,7 @@ namespace TuxStream.Core
             }
             return false;
         }
-        
+
         public Install()
         {
             if (!IsInstalled())

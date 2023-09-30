@@ -6,6 +6,7 @@ using TuxStream.Plugin;
 using TuxStream.Provider;
 using TuxStream;
 using System.Globalization;
+using TuxStream.Core;
 
 namespace TuxStream
 {

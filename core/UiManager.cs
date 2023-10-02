@@ -3,6 +3,7 @@ using TuxStream.Core.UI.Components;
 using TuxStream.Core.UI;
 using TuxStream.Plugin;
 using static TuxStream.Plugin.TmdbObj;
+using TuxStream.Core.Obj;
 
 namespace TuxStream.Core.UI
 {
@@ -44,25 +45,25 @@ namespace TuxStream.Core.UI
 
             }
         }
-        public void Search(string query)
+        public async Task Search(string query)
         {
             SelectPage selectPage = new SelectPage();
             ProviderManager providerManager = new ProviderManager();
 
             TmdbApi tmdbApi = new TmdbApi();
-            List<Movie> movies =tmdbApi.Search(query);
+            List<Movie> movies = tmdbApi.Search(query).Result;
 
 
 
             int TMDbID = selectPage.Select(movies);
             if (TMDbID == 0) { return; }
 
-            List<string> links = providerManager.RunProviders(query, TMDbID);
+            List<Links> links = providerManager.RunProviders(query, TMDbID);
             PlayMovie(links, TMDbID, movies);
 
 
         }
-        public void PlayMovie(List<string> links, int TMDbID, List<Movie> movies)
+        public void PlayMovie(List<Links> links, int TMDbID, List<Movie> movies)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
 

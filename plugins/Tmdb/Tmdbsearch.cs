@@ -1,5 +1,4 @@
-using TuxStream.Plugin;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace TuxStream.Plugin
 {
@@ -9,19 +8,15 @@ namespace TuxStream.Plugin
 
         public TmdbApi()
         {
-            
+
         }
-        public List<TmdbObj.Movie> Search(string _query)
+        public async Task<List<TmdbObj.Movie>> Search(string _query)
         {
-            string json = getMovieData(_query).Result;
+            string json = await getMovieData(_query);
 
-            List<TmdbObj.Movie> movies = new List<TmdbObj.Movie>();
-
-            movies = JsonConvert.DeserializeObject<List<TmdbObj.Movie>>(json);
+            List<TmdbObj.Movie> movies = JsonSerializer.Deserialize<List<TmdbObj.Movie>>(json);
 
             return movies;
-
-
         }
         public async Task<string> getMovieData(string query)
         {

@@ -1,4 +1,5 @@
-using Newtonsoft.Json;
+
+using System.Text.Json.Serialization;
 
 namespace TuxStream.Plugin
 {
@@ -6,29 +7,33 @@ namespace TuxStream.Plugin
     {
         public class Movie
         {
+            [JsonPropertyName("adult")]
             public bool Adult { get; set; }
+            [JsonPropertyName("backdrop_path")]
             public string BackdropPath { get; set; }
+            [JsonPropertyName("genre_ids")]
             public List<int> GenreIds { get; set; }
-
-            [JsonProperty("id")]
-            [JsonConverter(typeof(IntConverter))]
+            [JsonPropertyName("id")]
             public int Id { get; set; }
+            [JsonPropertyName("original_language")]
             public string OriginalLanguage { get; set; }
+            [JsonPropertyName("original_title")]
             public string OriginalTitle { get; set; }
+            [JsonPropertyName("overview")]
             public string Overview { get; set; }
-
-            [JsonProperty("popularity")]
-            [JsonConverter(typeof(DoubleConverter))]
+            [JsonPropertyName("popularity")]
             public double Popularity { get; set; }
+            [JsonPropertyName("poster_path")]
             public string PosterPath { get; set; }
-            [JsonProperty("release_date")]
-            public string? ReleaseDate { get; set; }
+            [JsonPropertyName("release_date")]
+            public string ReleaseDate { get; set; }
+            [JsonPropertyName("title")]
             public string Title { get; set; }
+            [JsonPropertyName("video")]
             public bool Video { get; set; }
-
-            [JsonProperty("vote_average")]
-            [JsonConverter(typeof(DoubleConverter))]
+            [JsonPropertyName("vote_average")]
             public double VoteAverage { get; set; }
+            [JsonPropertyName("vote_count")]
             public int VoteCount { get; set; }
         }
 

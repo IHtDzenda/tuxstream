@@ -7,6 +7,7 @@ using TuxStream.Provider;
 using TuxStream;
 using System.Globalization;
 using TuxStream.Core;
+using TuxStream.Core.Obj;
 
 namespace TuxStream
 {
@@ -32,20 +33,15 @@ namespace TuxStream
 
             return plugins;
         }
-        public List<string> RunProviders(string _query, int _tmdbid)
+        public List<Links> RunProviders(string _query, int _tmdbid)
         {
             List<IProvider> plugins = LoadProviders();
-            List<string> Links = new List<string>();
+            List<Links> links = new List<Links>();
             foreach (var plugin in plugins)
             {
-                List<string> strings = plugin.Main(_query , _tmdbid);
-                foreach (var str in strings)
-                {
-                    Links.Add(str);
-                }
-                
+                links.Add(plugin.Main(_query, _tmdbid));   
             }
-            return Links;
+            return links;
         }
     }
 }

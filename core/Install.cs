@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TuxStream.Core.Obj;
-using Newtonsoft.Json;
 
 namespace TuxStream.Core
 {
@@ -148,7 +147,7 @@ namespace TuxStream.Core
             }
             else if (os == OSPlatform.Linux)
             {
-                string homepath = Environment.GetEnvironmentVariable("HOME");
+                string? homepath = Environment.GetEnvironmentVariable("HOME");
                 string configpath = homepath + "/.config/tuxstream";
                 MakeConfigfiles(configpath, "/config.json", homepath);
             }
@@ -191,7 +190,7 @@ namespace TuxStream.Core
             };
 
 
-            string confiDataJson = JsonConvert.SerializeObject(configData, Formatting.Indented);
+            string confiDataJson = System.Text.Json.JsonSerializer.Serialize(configData);
             if (!File.Exists(configpath + file))
             {
                 try

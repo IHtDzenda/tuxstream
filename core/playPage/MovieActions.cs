@@ -1,87 +1,83 @@
 using Spectre.Console;
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using TuxStream.Core.Obj;
 namespace TuxStream.Core.UI
 {
     class MovieActions
     {
-        int linkIndex = 0;
-        int providerIndex = 0;
 
         public MovieActions()
         {
 
         }
-        public void Select(List<Links> links, ref ConsoleKeyInfo key)
+        public void Select(List<Links> links,ref ConsoleKeyInfo key , ref int providerIndex, ref int activeLink)
         {
-            AnsiConsole.MarkupLine($"[bold]P[/]lay movie , [bold]C[/]hose a link, [bold]N[/]ew link({links[linkIndex].links.Count}/{linkIndex}), [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
+            if (links.Count == 0 || links[activeLink].links == null)
+            {
+                AnsiConsole.MarkupLine("[red]No links found[/]");
+                Thread.Sleep(5000);
+                return;
+            }
+
+
+            AnsiConsole.MarkupLine($"Streaming from: {links[providerIndex].name} Quality {links[providerIndex].links[activeLink].quality} ");
+            AnsiConsole.MarkupLine($"[bold underline]P[/]lay movie , [bold]C[/]hose a link, [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
 
             key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.P) { Play(links[providerIndex].links[linkIndex]); }
-            else if (key.Key == ConsoleKey.N) { NewLink(links[providerIndex].links.Count); }
-            else if (key.Key == ConsoleKey.D) { Download(links[providerIndex].links[linkIndex].link); }
-            else if (key.Key == ConsoleKey.C) { linkIndex = PickUrl(links); }
+            if (key.Key == ConsoleKey.P) { Play(links[providerIndex].links[activeLink]); }
+            else if (key.Key == ConsoleKey.D) { Download(links[providerIndex].links[activeLink].link); }
+            else if (key.Key == ConsoleKey.C) { activeLink = PickQuality(links); }
             else if (key.Key == ConsoleKey.S) { return; }
             else if (key.Key == ConsoleKey.Q) { Environment.Exit(0); }
-            else if (key.Key == ConsoleKey.L) { Console.WriteLine(links[linkIndex]); Thread.Sleep(5000); }
+            else if (key.Key == ConsoleKey.L) { Console.WriteLine(links[providerIndex].links[activeLink].link); Thread.Sleep(5000); }
 
 
         }
 
-        int PickUrl(List<Links> links )
+        private int PickQuality(List<Links> links, int providerIndex = 0)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             int selectedLinkID = 0;
             do
             {
-
-                foreach (var provider in links)
+                var rule = new Rule($"Provider : [red]{links[providerIndex].name}[/]");
+                rule.Style = Style.Parse("red dim");
+                AnsiConsole.Write(rule);
+                for (int i = 0; i < links[providerIndex].links.Count; i++)
                 {
-                    var rule = new Rule($"Provider[red]{provider.name}[/]");
-                    rule.Style = Style.Parse("red dim");
-                    AnsiConsole.Write(rule);
-                    for (int i = 0; i < provider.links.Count; i++)
+                    if (i == selectedLinkID)
                     {
-                        if (i == selectedLinkID)
-                        {
-                            AnsiConsole.MarkupLine($"[red]==>[/][bold]{i})[/] {provider.links[i].quality}");
-                            continue;
-                        }
-
-                        AnsiConsole.MarkupLine($"   {i}) {provider.links[i].quality}");
+                        AnsiConsole.MarkupLine($"[red]==>[/][bold]{i})[/] {links[providerIndex].links[i].quality}");
+                        continue;
                     }
 
-
-
-
-
+                    AnsiConsole.MarkupLine($"   {i}) {links[providerIndex].links[i].quality}");
                 }
+
                 key = Console.ReadKey(true);
                 Console.Clear();
 
-                if (key.Key == ConsoleKey.DownArrow) { selectedLinkID++; }
+                if (key.Key == ConsoleKey.DownArrow) { MoveLink(ref selectedLinkID, 4, +1); }
+                if (key.Key == ConsoleKey.UpArrow) { MoveLink(ref selectedLinkID, 4, -1); }
+
 
             } while (key.Key != ConsoleKey.Enter);
             return selectedLinkID;
 
         }
-        void NewLink(int linkCount)
+        private void MoveLink(ref int number, int max, int move)
         {
-            if (linkIndex == linkCount - 1)
-            {
-                linkIndex = 0;
-                return;
-            }
-            linkIndex++;
-
+            if (number + move > max) { number = 0; }
+            else if (number + move < 0) { number = max; }
+            else { number += move; }
         }
-        void Download(string link)
+
+        private void Download(string link)
         {
             Download download = new Download();
             download.DownloadMovie(link);
         }
-        void Play(Link link)
+        private void Play(Link link)
         {
             ProcessStartInfo psi = new ProcessStartInfo()
             {

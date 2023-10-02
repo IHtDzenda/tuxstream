@@ -66,18 +66,19 @@ namespace TuxStream.Core.UI
         public void PlayMovie(List<Links> links, int TMDbID, List<Movie> movies)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
-
+            MovieActions movieActions = new MovieActions();
+            int curentLink = 0;
+            int curentProvider = 0;
             while (key.Key != ConsoleKey.S)
             {
                 Console.Clear();
                 MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
-                MovieActions movieActions = new MovieActions();
-                movieActions.Select(links, ref key);
+                movieActions.Select(links,ref key, ref curentProvider, ref curentLink);
 
 
             }
 
-        
+
         }
     }
 }

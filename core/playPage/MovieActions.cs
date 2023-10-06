@@ -1,6 +1,7 @@
 using Spectre.Console;
 using System.Diagnostics;
 using TuxStream.Core.Obj;
+using TuxStream.Plugin;
 namespace TuxStream.Core.UI
 {
     class MovieActions
@@ -10,9 +11,9 @@ namespace TuxStream.Core.UI
         {
 
         }
-        public void Select(List<Links> links,ref ConsoleKeyInfo key , ref int providerIndex, ref int activeLink)
+        public void Select(List<Links> links, string movieName, ref ConsoleKeyInfo key, ref int providerIndex, ref int activeLink, int TMDbID)
         {
-            if (links.Count == 0 || links[activeLink].links == null)
+            if (links.Count == 0 || links[activeLink].links.Count == 0)
             {
                 AnsiConsole.MarkupLine("[red]No links found[/]");
                 Thread.Sleep(5000);
@@ -22,9 +23,8 @@ namespace TuxStream.Core.UI
 
             AnsiConsole.MarkupLine($"Streaming from: {links[providerIndex].name} Quality {links[providerIndex].links[activeLink].quality} ");
             AnsiConsole.MarkupLine($"[bold underline]P[/]lay movie , [bold]C[/]hose a link, [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
-
             key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.P) { Play(links[providerIndex].links[activeLink]); }
+            if (key.Key == ConsoleKey.P) { Play(links[providerIndex].links[activeLink], TMDbID, movieName); }
             else if (key.Key == ConsoleKey.D) { Download(links[providerIndex].links[activeLink].link); }
             else if (key.Key == ConsoleKey.C) { activeLink = PickQuality(links); }
             else if (key.Key == ConsoleKey.S) { return; }
@@ -77,22 +77,25 @@ namespace TuxStream.Core.UI
             Download download = new Download();
             download.DownloadMovie(link);
         }
-        private void Play(Link link)
+        private async Task Play(Link link, int TMDbID, string movieName)
         {
-            ProcessStartInfo psi = new ProcessStartInfo()
+            Setting setting = new Setting();
+            string player = setting.GetPlayer();
+            if (player == "vlc")
             {
-                FileName = "mpv",
-                Arguments = link.link,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false
-            };
+                Vlc vlc = new Vlc(link, TMDbID, movieName);
+                vlc.Play();
+            }
+            if (player == "mpv")
+            {
+                Mpv mpv = new Mpv(link, TMDbID, movieName);
+                mpv.Play();
+            }
+            else
+            {
+                throw new Exception("Player not supported!");
+            }
 
-            // Create a new process
-            Process vlcProcess = new Process() { StartInfo = psi };
-
-            // Start VLC
-            vlcProcess.Start();
 
         }
     }

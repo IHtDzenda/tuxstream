@@ -59,21 +59,25 @@ namespace TuxStream.Core.UI
             if (TMDbID == 0) { return; }
 
             List<Links> links = providerManager.RunProviders(query, TMDbID);
-            PlayMovie(links, TMDbID, movies);
+            PlayMovie(links, movies, TMDbID);
 
 
         }
-        public void PlayMovie(List<Links> links, int TMDbID, List<Movie> movies)
+        public void PlayMovie(List<Links> links, List<Movie> movies, int TMDbID)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             MovieActions movieActions = new MovieActions();
+            MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
+            Movie activeMovie = movieDetails.GetActiveMovie();
+
             int curentLink = 0;
             int curentProvider = 0;
+
             while (key.Key != ConsoleKey.S)
             {
                 Console.Clear();
-                MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
-                movieActions.Select(links,ref key, ref curentProvider, ref curentLink);
+                movieDetails.ShowMovieDetails();
+                movieActions.Select(links, activeMovie.Title, ref key, ref curentProvider, ref curentLink, TMDbID);
 
 
             }

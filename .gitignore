@@ -2,3 +2,4 @@ providers/*
 bin/
 obj/
 Build.sh
+.config/*

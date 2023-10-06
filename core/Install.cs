@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TuxStream.Core.Obj;
@@ -78,7 +79,7 @@ namespace TuxStream.Core
             else if (os == OSPlatform.Linux)
             {
                 string distribution = DetectLinuxDistribution();
-                
+
                 if (distribution == "debian") { LinuxRun("sudo", "apt-get install -y ffmpeg"); }
                 else if (distribution == "arch")
                 { LinuxRun("sudo", "pacman -S --noconfirm  ffmpeg"); }
@@ -142,8 +143,8 @@ namespace TuxStream.Core
             if (os == OSPlatform.Windows)
             {
                 string homepath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                string configpath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\tuxstream";
-                MakeConfigfiles(configpath + @"\config.json", homepath);
+                string configpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "tuxstream");
+                MakeConfigfiles(configpath, @"\config.json", homepath);
             }
             else if (os == OSPlatform.Linux)
             {
@@ -170,8 +171,34 @@ namespace TuxStream.Core
                     Console.WriteLine($"Error creating folder: {ex.Message}");
                 }
             }
+            ConfigObj.Config configData = GenerateConfigObj(homepath);
 
-            var configData = new ConfigObj.Config
+            string confiDataJson = System.Text.Json.JsonSerializer.Serialize(configData);
+            if (!File.Exists(configpath + file))
+            {
+                try
+                {
+                    File.WriteAllText(Path.Combine(configpath + file), confiDataJson, Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error creating config.json: {ex.Message}");
+                }
+            }
+
+
+
+        }
+
+        private static ConfigObj.Config GenerateConfigObj(string homepath)
+        {
+            string defaltPlayer = "vlc";
+            OSPlatform os = GetOs();
+            if (os == OSPlatform.Linux)
+            {
+                defaltPlayer = "mpv";
+            }
+            return new ConfigObj.Config
             {
                 Subtitles = new ConfigObj.Subtitles
                 {
@@ -182,32 +209,26 @@ namespace TuxStream.Core
                 {
                     Searches = new string[] { }
                 },
+                WatchHistory = new ConfigObj.WatchHistory
+                {
+                    History = new List<ConfigObj.WatchHistoryObj>
+                     {
+                            new ConfigObj.WatchHistoryObj
+                            {
+                                MovieName = "",
+                                tmdbId = 0,
+                                WatchtimeSec = 0
+                            }
+                    }
+                },
                 Downloads = new ConfigObj.Downloads
                 {
                     Path = $@"{homepath}/Downloads/",
                     DownloadedMovies = new ConfigObj.DownloadedMovie[] { }
-                }
+                },
+                Player = defaltPlayer
+
             };
-
-
-            string confiDataJson = System.Text.Json.JsonSerializer.Serialize(configData);
-            if (!File.Exists(configpath + file))
-            {
-                try
-                {
-                    File.WriteAllText(configpath + file, confiDataJson);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error creating config.json: {ex.Message}");
-                }
-            }
-            else
-            {
-            }
-
-
         }
-
     }
 }

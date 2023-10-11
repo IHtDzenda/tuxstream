@@ -13,10 +13,9 @@ namespace TuxStream.Core
         {
             string ffmpegCommand = $" -i {link} -bsf:a aac_adtstoasc -loglevel quiet -stats -vcodec copy -c copy -crf 50 file.mp4";
 
-            // Create a new ProcessStartInfo
             ProcessStartInfo psi = new ProcessStartInfo()
             {
-                FileName = "ffmpeg", // Assuming FFmpeg is in your system's PATH
+                FileName = "ffmpeg", 
                 Arguments = ffmpegCommand,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -24,10 +23,8 @@ namespace TuxStream.Core
                 CreateNoWindow = true
             };
 
-            // Create a new process
             Process ffmpegProcess = new Process() { StartInfo = psi };
 
-            // Event handler for capturing output
             ffmpegProcess.OutputDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
@@ -36,7 +33,6 @@ namespace TuxStream.Core
                 }
             };
 
-            // Event handler for capturing errors
             ffmpegProcess.ErrorDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
@@ -45,13 +41,10 @@ namespace TuxStream.Core
                 }
             };
 
-            // Start FFmpeg
             ffmpegProcess.Start();
 
-            //ffmpegProcess.BeginOutputReadLine();
             ffmpegProcess.BeginErrorReadLine();
 
-            // Wait for FFmpeg to exit
             ffmpegProcess.WaitForExit();
         }
     }

@@ -9,9 +9,8 @@ namespace TuxStream.Core.UI
 {
     class MainUI
     {
-        public MainUI()
-        {
-        }
+        public MainUI() { }
+
         public void HomePage()
         {
             Console.Clear();
@@ -40,11 +39,10 @@ namespace TuxStream.Core.UI
                 {
                     settingsPage.SettingsTab(ref selectedTab);
                     continue;
-
                 }
-
             }
         }
+
         public async Task Search(string query)
         {
             SelectPage selectPage = new SelectPage();
@@ -53,16 +51,19 @@ namespace TuxStream.Core.UI
             TmdbApi tmdbApi = new TmdbApi();
             List<Movie> movies = tmdbApi.Search(query).Result;
 
+            int TMDbID = selectPage.Select(movies, ref query);
+            if (TMDbID == 0)
+            {
+                return;
+            }
+            Console.Clear();
 
+            List<Links> links = providerManager.RunProviders(query, TMDbID).Result;
+            
 
-            int TMDbID = selectPage.Select(movies);
-            if (TMDbID == 0) { return; }
-
-            List<Links> links = providerManager.RunProviders(query, TMDbID);
             PlayMovie(links, movies, TMDbID);
-
-
         }
+
         public void PlayMovie(List<Links> links, List<Movie> movies, int TMDbID)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
@@ -77,12 +78,15 @@ namespace TuxStream.Core.UI
             {
                 Console.Clear();
                 movieDetails.ShowMovieDetails();
-                movieActions.Select(links, activeMovie.Title, ref key, ref curentProvider, ref curentLink, TMDbID);
-
-
+                movieActions.Select(
+                    links,
+                    activeMovie.Title,
+                    ref key,
+                    ref curentProvider,
+                    ref curentLink,
+                    TMDbID
+                );
             }
-
-
         }
     }
 }

@@ -1,5 +1,7 @@
+using TuxStream.Core;
 using Spectre.Console;
 using TuxStream.Core.UI.Components;
+
 namespace TuxStream.Core.UI
 {
     public class DonwoladPage
@@ -13,14 +15,12 @@ namespace TuxStream.Core.UI
             Console.Clear();
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             TabsComponent tabs = new TabsComponent();
-
+            Setting setting = new Setting();
 
             while (true)
             {
                 tabs.TabsShow(selectedTab);
-
-                AnsiConsole.MarkupLine("[gray bold]Donwolad: [/]");
-
+                            
 
 
                 key = Console.ReadKey(true);
@@ -30,6 +30,7 @@ namespace TuxStream.Core.UI
 
                 Console.Clear();
             }
+
         }
     }
 }

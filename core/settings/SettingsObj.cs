@@ -9,6 +9,8 @@ namespace TuxStream.Core.Obj
             public Downloads? Downloads { get; set; }
             public WatchHistory? WatchHistory { get;  set; }
             public string? Player { get; set; }
+            public string[]? PreferedLanguages { get; set; }
+            public string? CachePath { get; set; }
         }
 
         public class Subtitles
@@ -43,6 +45,7 @@ namespace TuxStream.Core.Obj
             public string? Name { get; set; }
             public string? Path { get; set; }
         }
+        
     }
 
 

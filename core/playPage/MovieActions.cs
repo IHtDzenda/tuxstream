@@ -13,13 +13,13 @@ namespace TuxStream.Core.UI
         }
         public void Select(List<Links> links, string movieName, ref ConsoleKeyInfo key, ref int providerIndex, ref int activeLink, int TMDbID)
         {
-            if (links.Count == 0 || links[activeLink].links.Count == 0)
+            if (links.Count == 0 || links[providerIndex].links.Count == 0)
             {
                 AnsiConsole.MarkupLine("[red]No links found[/]");
                 Thread.Sleep(5000);
                 return;
             }
-
+ 
 
             AnsiConsole.MarkupLine($"Streaming from: {links[providerIndex].name} Quality {links[providerIndex].links[activeLink].quality} ");
             AnsiConsole.MarkupLine($"[bold underline]P[/]lay movie , [bold]C[/]hose a link, [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
@@ -40,7 +40,7 @@ namespace TuxStream.Core.UI
             int selectedLinkID = 0;
             do
             {
-                var rule = new Rule($"Provider : [red]{links[providerIndex].name}[/]");
+                var rule = new Rule($"Provider : [red]{links[providerIndex].name} Lang: {links[providerIndex].links[0].language}[/]");
                 rule.Style = Style.Parse("red dim");
                 AnsiConsole.Write(rule);
                 for (int i = 0; i < links[providerIndex].links.Count; i++)
@@ -57,8 +57,8 @@ namespace TuxStream.Core.UI
                 key = Console.ReadKey(true);
                 Console.Clear();
 
-                if (key.Key == ConsoleKey.DownArrow) { MoveLink(ref selectedLinkID, 4, +1); }
-                if (key.Key == ConsoleKey.UpArrow) { MoveLink(ref selectedLinkID, 4, -1); }
+                if (key.Key == ConsoleKey.DownArrow) { MoveLink(ref selectedLinkID, links.Count+1, +1); }
+                if (key.Key == ConsoleKey.UpArrow) { MoveLink(ref selectedLinkID, links.Count+1, -1); }
 
 
             } while (key.Key != ConsoleKey.Enter);

@@ -66,8 +66,14 @@ namespace TuxStream.Core
         {
             return Config.Player;
         }
-
-
+        public string[] GetLanguages()
+        {
+            return Config.PreferedLanguages;
+        }
+        public string GetCachePath()
+        {
+            return Config.CachePath;
+        }
 
 
     }

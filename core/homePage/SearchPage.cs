@@ -24,7 +24,7 @@ namespace TuxStream.Core.UI
                 AnsiConsole.MarkupLine("[gray bold]Search: [/]");
                 AnsiConsole.MarkupLine($"[red]==>[/]{SearchQuery}");
                 AnsiConsole.MarkupLine($"   ");
-
+                
 
                 key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter) { Console.Clear(); return true; }

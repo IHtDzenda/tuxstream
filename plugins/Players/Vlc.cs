@@ -28,11 +28,13 @@ namespace TuxStream.Plugin
         }
         public async Task Play()
         {
-            string programPath = GetOsPaths();
+            string programPath = "";
+            string programArguments = "";
+            GetProgramPats(ref programPath, ref programArguments);
             ProcessStartInfo psi = new ProcessStartInfo()
             {
                 FileName = programPath,
-                Arguments = $" --http-password=abc {link.link} --intf qt --extraintf http --http-host 127.0.0.1",
+                Arguments = $"{programArguments} --http-password=abc {link.link} --intf qt --extraintf http --http-host 127.0.0.1",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
@@ -45,18 +47,23 @@ namespace TuxStream.Plugin
 
         }
 
-        private static string GetOsPaths ()
+        private static void GetProgramPats(ref string programPath, ref string programArguments)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return  @"C:\Program Files\VideoLAN\VLC\vlc.exe";
+                programPath = "\"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe\"";
+                programArguments = "";
+
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                return  "vlc";
+                programPath = "vlc";
+                programArguments = "";
             }
             else
             {
+                programArguments = "";
+                programPath = "";
                 throw new Exception("OS not supported!");
             }
         }
@@ -64,11 +71,11 @@ namespace TuxStream.Plugin
         {
             while (true)
             {
-            {
-                Thread.Sleep(15000);
-                int watchTime = await GetWatchtime();
-                players.WriteHistory(watchTime);
-            }
+                {
+                    Thread.Sleep(15000);
+                    int watchTime = await GetWatchtime();
+                    players.WriteHistory(watchTime);
+                }
             }
         }
         public async Task<int> GetWatchtime()

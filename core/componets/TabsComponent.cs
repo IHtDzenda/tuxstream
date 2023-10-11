@@ -4,7 +4,7 @@ namespace TuxStream.Core.UI.Components
 {
     public class TabsComponent
     {
-        string[] tabs = new string[] { "Search", "Donwolad", "Settings" };
+        string[] tabs = new string[] { "Search", "Library", "Settings" };
 
         public string Tabs(int _selectedTab)
         {

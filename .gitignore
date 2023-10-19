@@ -4,3 +4,5 @@ obj/
 Build.sh
 .config/*
 tuxstream.sln
+.vscode/extensions.json
+.vscode/launch.json

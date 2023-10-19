@@ -16,7 +16,6 @@ namespace TuxStream.Core.UI
             Console.Clear();
             SearchPage searchPage = new SearchPage();
             SettingsPage settingsPage = new SettingsPage();
-            DonwoladPage donwoladPage = new DonwoladPage();
 
             int selectedTab = 0;
             string SearchQuery = "";
@@ -25,14 +24,17 @@ namespace TuxStream.Core.UI
             {
                 if (selectedTab == 0)
                 {
-                    if (searchPage.SearchTab(ref selectedTab, ref SearchQuery))
+                    bool continueSearch = searchPage.SearchTab(ref selectedTab, ref SearchQuery);
+                    if (continueSearch)
                     {
                         Search(SearchQuery);
                     }
                 }
                 else if (selectedTab == 1)
                 {
-                    donwoladPage.DonwoladTab(ref selectedTab);
+                    LibaryPage libaryPage = new LibaryPage();
+
+                    libaryPage.DonwoladTab(ref selectedTab);
                     continue;
                 }
                 else if (selectedTab == 2)
@@ -43,13 +45,14 @@ namespace TuxStream.Core.UI
             }
         }
 
-        public async Task Search(string query)
+        public void Search(string query)
         {
             SelectPage selectPage = new SelectPage();
             ProviderManager providerManager = new ProviderManager();
 
             TmdbApi tmdbApi = new TmdbApi();
             List<Movie> movies = tmdbApi.Search(query).Result;
+            Movie movie = new Movie();
 
             int TMDbID = selectPage.Select(movies, ref query);
             if (TMDbID == 0)
@@ -57,19 +60,27 @@ namespace TuxStream.Core.UI
                 return;
             }
             Console.Clear();
+            movie = movies.Where(x => x.Id == TMDbID).FirstOrDefault();
+
 
             List<Links> links = providerManager.RunProviders(query, TMDbID).Result;
-            
+            PlayMovie(links, movie, TMDbID);
+        }
+        public async void PlayMovieFromLibary(string MovieName, int TMDbID)
+        {
+            ProviderManager providerManager = new ProviderManager();
+            TmdbApi tmdbApi = new TmdbApi();
+            Movie movie =  tmdbApi.Search(MovieName).Result.FirstOrDefault();
+            List<Links> links = providerManager.RunProviders(MovieName, TMDbID).Result;
+            PlayMovie(links, movie, TMDbID);
 
-            PlayMovie(links, movies, TMDbID);
         }
 
-        public void PlayMovie(List<Links> links, List<Movie> movies, int TMDbID)
+        public void PlayMovie(List<Links> links, Movie movie, int TMDbID)
         {
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             MovieActions movieActions = new MovieActions();
-            MovieDetails movieDetails = new MovieDetails(TMDbID, movies);
-            Movie activeMovie = movieDetails.GetActiveMovie();
+            MovieDetails movieDetails = new MovieDetails();
 
             int curentLink = 0;
             int curentProvider = 0;
@@ -77,10 +88,10 @@ namespace TuxStream.Core.UI
             while (key.Key != ConsoleKey.S)
             {
                 Console.Clear();
-                movieDetails.ShowMovieDetails();
+                movieDetails.ShowMovieDetails(movie);
                 movieActions.Select(
                     links,
-                    activeMovie.Title,
+                    movie.Title,
                     ref key,
                     ref curentProvider,
                     ref curentLink,

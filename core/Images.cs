@@ -25,7 +25,7 @@ namespace TuxStream.Core
             return posterPath;
         }
 
-        private string GetPosterPathLocal(int TMDbID)
+        public string GetPosterPathLocal(int TMDbID)
         {
             string Path = CachePath + TMDbID + ".jpg";
             if (System.IO.File.Exists(Path))

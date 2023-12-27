@@ -81,10 +81,17 @@ namespace TuxStream.Core.UI
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             MovieActions movieActions = new MovieActions();
             MovieDetails movieDetails = new MovieDetails();
-
+            
             int curentLink = 0;
             int curentProvider = 0;
+            for (int i = 0; i < links.Count; i++)
+            {
+                if (links[i].links.Count == 0)
+                {
+                    links.RemoveAt(i);
+                }
 
+            }
             while (key.Key != ConsoleKey.S)
             {
                 Console.Clear();

@@ -12,6 +12,7 @@ namespace TuxStream.Plugin
 {
     public class Mpv
     {
+        private Setting setting = new Setting();
         public Link link;
         public int tmdbId;
         public string MovieName;
@@ -30,13 +31,12 @@ namespace TuxStream.Plugin
         {
             string pipeName = "";
             string programPath = "";
-
+            string subtitles=  $" --sub-auto=all --sub-file-paths={setting.GetCachePath()}/Subtitles/{tmdbId}";
             GetOsPaths(ref pipeName, ref programPath);
-
             ProcessStartInfo psi = new ProcessStartInfo()
             {
                 FileName = programPath,
-                Arguments = $"{link.link} --input-ipc-server={pipeName} , --start={activeRecord.WatchtimeSec}",
+                Arguments = $"{link.link} --input-ipc-server={pipeName} , --start={activeRecord.WatchtimeSec} {subtitles}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false
@@ -111,7 +111,6 @@ namespace TuxStream.Plugin
 
         public async Task LogHistory(string pipeName)
         {
-            Setting setting = new Setting();
 
             List<ConfigObj.WatchHistoryObj> viewHistory = setting.GetWatchHistory();
 

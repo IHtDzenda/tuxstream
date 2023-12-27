@@ -21,15 +21,16 @@ namespace TuxStream.Core.UI
             }
  
 
-            AnsiConsole.MarkupLine($"Streaming from: {links[providerIndex].name} Quality {links[providerIndex].links[activeLink].quality} ");
-            AnsiConsole.MarkupLine($"[bold underline]P[/]lay movie , [bold]C[/]hose a link, [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit");
+            AnsiConsole.MarkupLine($"Streaming from: {links[providerIndex].name} Quality {links[providerIndex].links[activeLink].quality} "+(links[providerIndex].subtitles.Count>0 ? $" Found {links[providerIndex].subtitles.Count} subtitles" : ""));
+            AnsiConsole.MarkupLine($"[bold underline]P[/]lay movie , [bold]C[/]hose a link, [bold]D[/]ownload movie , [bold]S[/]earch again ,[bold]L[/]ist link, [bold]Q[/]uit "+(links[providerIndex].subtitles.Count>0 ? "" : "No subtitles found [bold]G[/]et subtitles"));
             key = Console.ReadKey(true);
-            if (key.Key == ConsoleKey.P) { Play(links[providerIndex].links[activeLink], TMDbID, movieName); }
+            if (key.Key == ConsoleKey.P) {SubtitleManager.DonwoladSubtitles(links[providerIndex].subtitles, links[providerIndex].name, TMDbID); Play(links[providerIndex].links[activeLink], TMDbID, movieName); }
             else if (key.Key == ConsoleKey.D) { Download(links[providerIndex].links[activeLink].link); }
             else if (key.Key == ConsoleKey.C) { activeLink = PickQuality(links); }
             else if (key.Key == ConsoleKey.S) { return; }
             else if (key.Key == ConsoleKey.Q) { Environment.Exit(0); }
             else if (key.Key == ConsoleKey.L) { Console.WriteLine(links[providerIndex].links[activeLink].link); Thread.Sleep(5000); }
+            else if (key.Key == ConsoleKey.G&&links[providerIndex].subtitles.Count<0 ){ throw new Exception("Feature not implemented ");}
 
 
         }
@@ -79,6 +80,7 @@ namespace TuxStream.Core.UI
         }
         private async Task Play(Link link, int TMDbID, string movieName)
         {
+            
             Setting setting = new Setting();
             string player = setting.GetPlayer();
             if (player == "vlc")

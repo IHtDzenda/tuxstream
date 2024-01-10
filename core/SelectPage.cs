@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using Spectre.Console;
+using TuxStream.Core;
 using TuxStream.Plugin;
 using static TuxStream.Plugin.TmdbObj;
-using TuxStream.Core;
 
 namespace TuxStream.Core.UI
 {
@@ -16,6 +16,13 @@ namespace TuxStream.Core.UI
             int activeSubIndex = 0;
             Images images = new Images();
             ConsoleKeyInfo key = new ConsoleKeyInfo();
+            if (movies.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[bold yellow]Waring[/] no tmdbId found defaulting to search query");
+                Thread.Sleep(1000);
+                Console.Clear();
+                return 0;
+            }       
             while (true)
             {
                 Console.Clear();
@@ -40,12 +47,6 @@ namespace TuxStream.Core.UI
                         Align.Center(new Markup($"Description: \n{movies[activeMovie].Overview}"))
                     )
                 );
-                layout["Image"].Update(
-                    new Panel(
-                        Align.Center(new CanvasImage(imagePath))
-                    ).Expand()
-                );
-                layout["Image"].Size(60);
                 string bindMessage =
                     activeSubIndex == 0
                         ? ""
@@ -57,6 +58,20 @@ namespace TuxStream.Core.UI
                         )
                     )
                 );
+                layout["Image"].Size(60);
+
+                if (imagePath != null)
+                {
+                    layout["Image"].Update(
+                        new Panel(Align.Center(new CanvasImage(imagePath))).Expand()
+                    );
+                }
+                else
+                {
+                    layout["Image"].Update(
+                        new Panel(Align.Center(new Markup("[bold red]No image found[/]"))).Expand()
+                    );
+                }
 
                 AnsiConsole.Write(layout);
 

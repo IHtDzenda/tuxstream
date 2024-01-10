@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using TuxStream.Plugin;
-using TuxStream.Provider;
+using Spectre.Console;
+using Spectre.Console.Rendering;
 using TuxStream;
-using System.Globalization;
 using TuxStream.Core;
 using TuxStream.Core.Obj;
-using Spectre.Console;
+using TuxStream.Plugin;
+using TuxStream.Provider;
 
 namespace TuxStream
 {
@@ -43,9 +44,15 @@ namespace TuxStream
         {
             Setting setting = new Setting();
             string[] langues = setting.GetLanguages();
-
+            bool queryOnly = _tmdbid == 0 ? true : false;
             List<IProvider> plugins = LoadProviders();
             List<Links> links = new List<Links>();
+            if (queryOnly)
+            {
+                plugins = plugins.Where(s => s.Config.Type == ProviderType.Query).ToList();
+            }
+
+
             await AnsiConsole
                 .Status()
                 .StartAsync(
@@ -54,10 +61,11 @@ namespace TuxStream
                     {
                         for (int i = 0; i < plugins.Count; i++)
                         {
-                            string[] providerLang = plugins[i].Languages();
+
+                            string[] providerLang = plugins[i].Config.Languages;
                             if (langues.Any(s => providerLang.Contains(s)))
                             {
-                                ctx.Status($"Loaded {i} source out of {plugins.Count}\n");
+                                ctx.Status($"Loaded {i} source out of {plugins.Count}\n working on {plugins[i].Config.ProviderName}");
                                 links.Add(await plugins[i].Main(_query, _tmdbid));
                             }
                         }

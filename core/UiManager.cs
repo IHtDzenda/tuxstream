@@ -1,9 +1,9 @@
 using Spectre.Console;
-using TuxStream.Core.UI.Components;
+using TuxStream.Core.Obj;
 using TuxStream.Core.UI;
+using TuxStream.Core.UI.Components;
 using TuxStream.Plugin;
 using static TuxStream.Plugin.TmdbObj;
-using TuxStream.Core.Obj;
 
 namespace TuxStream.Core.UI
 {
@@ -55,25 +55,33 @@ namespace TuxStream.Core.UI
             Movie movie = new Movie();
 
             int TMDbID = selectPage.Select(movies, ref query);
-            if (TMDbID == 0)
+            if (TMDbID != 0)
             {
-                return;
+                movie = movies.Where(x => x.Id == TMDbID).FirstOrDefault();
+            }
+            if (movies.Count == 0)
+            {
+                movie = new Movie() { Title = query, Overview = "No overview found" };
             }
             Console.Clear();
-            movie = movies.Where(x => x.Id == TMDbID).FirstOrDefault();
-
 
             List<Links> links = providerManager.RunProviders(query, TMDbID).Result;
+            if (links != null && links.All(x => x.links.Count == 0))
+            {
+                AnsiConsole.MarkupLine($"[red]No links found for '{query}' [/][grey](press any key to go back to search)[/]");
+                Console.ReadKey();
+                return;
+            }
             PlayMovie(links, movie, TMDbID);
         }
+
         public async void PlayMovieFromLibary(string MovieName, int TMDbID)
         {
             ProviderManager providerManager = new ProviderManager();
             TmdbApi tmdbApi = new TmdbApi();
-            Movie movie =  tmdbApi.Search(MovieName).Result.FirstOrDefault();
+            Movie movie = tmdbApi.Search(MovieName).Result.FirstOrDefault();
             List<Links> links = providerManager.RunProviders(MovieName, TMDbID).Result;
             PlayMovie(links, movie, TMDbID);
-
         }
 
         public void PlayMovie(List<Links> links, Movie movie, int TMDbID)
@@ -81,7 +89,7 @@ namespace TuxStream.Core.UI
             ConsoleKeyInfo key = new ConsoleKeyInfo();
             MovieActions movieActions = new MovieActions();
             MovieDetails movieDetails = new MovieDetails();
-            
+
             int curentLink = 0;
             int curentProvider = 0;
             for (int i = 0; i < links.Count; i++)
@@ -90,7 +98,6 @@ namespace TuxStream.Core.UI
                 {
                     links.RemoveAt(i);
                 }
-
             }
             while (key.Key != ConsoleKey.S)
             {

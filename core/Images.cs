@@ -1,7 +1,8 @@
+using System.Net;
 using TuxStream.Core;
 using TuxStream.Core.Obj;
 using static TuxStream.Plugin.TmdbObj;
-using System.Net;
+
 namespace TuxStream.Core
 {
     public class Images
@@ -16,12 +17,14 @@ namespace TuxStream.Core
 
         public string GetPosterPath(Movie movie)
         {
-            string posterPath="";
+            string posterPath = "";
             posterPath = GetPosterPathLocal(movie.Id);
-            if (posterPath=="")
+            if (posterPath == "")
             {
-                posterPath = GetPosterPathOnline(movie.Id,movie.PosterPath);
+                posterPath = GetPosterPathOnlineAsync(movie.Id, movie.PosterPath).Result;
+                if (posterPath == null) { return null;}
             }
+
             return posterPath;
         }
 
@@ -36,13 +39,22 @@ namespace TuxStream.Core
             return "";
         }
 
-        private string GetPosterPathOnline(int TMDbID,string posterPath)
+        private async Task<string> GetPosterPathOnlineAsync(int TMDbID, string posterPath)
         {
-            string url = "https://image.tmdb.org/t/p/w500" + posterPath ;
+            string url = "https://image.tmdb.org/t/p/w500" + posterPath;
             string imagePath = CachePath + TMDbID + ".jpg";
-            using (WebClient client = new WebClient())
+            using (HttpClient client = new HttpClient())
             {
-                client.DownloadFile(new Uri(url),imagePath);
+                HttpResponseMessage response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+                    File.WriteAllBytes(imagePath, imageBytes);
+                }
+                else
+                {
+                    return null;
+                }
             }
             return imagePath;
         }
